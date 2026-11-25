@@ -149,10 +149,10 @@ Como muestra la Fig.~\ref{fig:escenario}, se simula una galería de $26\times5\t
 \subsection{Arquitecturas y métricas de desempeño}
 Se evalúan cuatro arquitecturas VLC manteniendo la misma potencia óptica total $P_t=10$~W: (1) \emph{1 LED} (solo luminaria~1), (2) \emph{2 LEDs fijos} (ambas luminarias emiten simultáneamente con potencia dividida 50/50), (3) \emph{selector ideal} (cota superior con conocimiento instantáneo perfecto del mejor enlace) y (4) \emph{selector práctico} (decide con información de canal cada 0.12~s, retardo de 0.06~s, error relativo del 8\,\%, histéresis del 5\,\%, corte de 25~ms por conmutación y 16~bits de pilotos adicionales).
 
-El desempeño se mide con la BER calculada sobre el tiempo en que el enlace está disponible ($d_k\in[0,1]$) y el Goodput útil promedio $G$:
+El desempeño se mide con la BER calculada sobre el tiempo en que el enlace está disponible ($d_k\in[0,1]$) y el Goodput útil promedio $G$ sobre los $K$ paquetes de la réplica:
 \begin{equation}
-\mathrm{BER}=\frac{\sum_k d_k\,e_k/L}{\sum_k d_k},\qquad
-G=\frac{R_b\,L}{L+n_p}\;\overline{d_k\,\mathbb{1}[e_k=0]},
+\mathrm{BER}=\frac{\sum_{k=1}^{K} d_k\,e_k/L}{\sum_{k=1}^{K} d_k},\qquad
+G=\frac{R_b\,L}{L+n_p}\,\frac{1}{K}\sum_{k=1}^{K} d_k\,\mathbb{1}[e_k=0],
 \label{eq:metricas}
 \end{equation}
 donde $L=128$~bits, $n_p=8$~bits de cabecera base y $e_k$ son los bits erróneos del paquete $k$. De esta forma, tanto en VLC como en Wi-Fi la BER mide estrictamente errores de transmisión cuando hay enlace disponible, mientras que las caídas o conmutaciones penalizan el Goodput y la disponibilidad se reporta por separado.
@@ -160,7 +160,7 @@ donde $L=128$~bits, $n_p=8$~bits de cabecera base y $e_k$ son los bits erróneos
 \subsection{Enlace Wi-Fi y esquema híbrido}
 El enlace de referencia Wi-Fi IEEE~802.11n (2.4~GHz, 20~MHz, 1 flujo espacial)~\cite{ieee80211n} transmite con $P_t=20$~dBm desde la luminaria~1 ($d=5.39$~m) y comparte exactamente las mismas obstrucciones. La pérdida sigue el modelo log-distancia con $n=2.2$ y sombreado lognormal ($\sigma=5$~dB), valores dentro del rango medido a 2.4~GHz en entornos industriales~\cite{tanghe2008}, sumando 15~dB cuando una máquina bloquea el trayecto. La EMI se modela como una elevación $\Delta_{\mathrm{EMI}}$ del piso de ruido térmico. El sistema selecciona el MCS más alto cuya sensibilidad cumple $P_r\ge S_{\mathrm{MCS}}+\Delta_{\mathrm{EMI}}$; si ninguno cumple, el enlace queda indisponible (Goodput nulo, sin asignar errores artificiales a la BER). La tasa útil es $\min(R_b,\,0.65\,R_{\mathrm{PHY}})$ y la BER se calcula para la modulación del MCS sin codificación.
 
-El esquema híbrido opera por defecto sobre \emph{2~LEDs fijos} (la mejor arquitectura VLC práctica) y conmuta a Wi-Fi cuando la relación señal-ruido óptica cae por debajo de $Q=12$ y el enlace Wi-Fi está disponible, perdiendo un paquete en cada transición.
+El esquema híbrido opera por defecto sobre \emph{2~LEDs fijos} (la mejor arquitectura VLC práctica en aire limpio y con obstrucciones) y conmuta a Wi-Fi cuando la relación señal-ruido óptica cae por debajo de $Q=12$ y el enlace Wi-Fi está disponible, perdiendo un paquete en cada transición.
 
 \subsection{Implementación, escenarios y validación}
 La simulación de Monte Carlo se implementó íntegramente en MATLAB (R2026a, sin \emph{toolboxes} adicionales) con semilla fija y 40 réplicas independientes de 24~s (480 paquetes cada una); el código fuente y los datos generados están disponibles en \url{https://github.com/benjamin09111/vlc_2}. Para comparar escenarios de obstrucciones en igualdad de condiciones, se genera la tasa máxima (40 llegadas/min) y se conserva una fracción aleatoria en cada caso (\emph{thinning} de Poisson). Los intervalos de confianza del 95\,\% se calculan entre réplicas y todas las arquitecturas comparten las mismas secuencias de bits y ruido. La Tabla~\ref{tab:esc} resume los escenarios simulados.
@@ -191,7 +191,7 @@ El simulador se validó en tres frentes:
 \begin{enumerate}
 \item \emph{Canal de referencia~\cite{palacios2020}}: en el túnel de $6\times3\times5$~m, la Fig.~\ref{fig:cir} reproduce el arribo directo (9.16~ns) seguido de las reflexiones. Con la expresión impresa en~\cite{palacios2020} (que omite el factor $1/\pi$ de~\cite{kahn1997,komine2004}) la razón reflejado/directo es 10.1\,\% frente al 11.47\,\% reportado, mientras que la ecuación~\eqref{eq:nlos} completa da 3.2\,\% y es la usada en toda la galería. El retardo $D_{\mathrm{RMS}}=0.30$~ns cae dentro del amplio rango reportado ($9\times10^{-12}$ a $8.3\times10^{-9}$~s), aunque el pulso directo resulta 3.4 veces menor al publicado sin causa identificable en los parámetros impresos, por lo que esta validación es parcial.
 \item \emph{BER Monte Carlo}: la Fig.~\ref{fig:ber} confirma que la simulación de $2\times10^{6}$ bits por punto coincide con la curva analítica $\tfrac{1}{2}\mathrm{erfc}(a/2\sqrt{2})$ dentro del IC~95\,\%.
-\item \emph{Bloqueo de Poisson}: para $\epsilon=20$/min y $T_d=30$~s en 4000 réplicas, la fracción bloqueada simulada es $2.37\,\%\pm0.22\,\%$ frente a $2.12\,\%$ analítico de~\eqref{eq:sombra}; difieren levemente (alrededor de un error estándar) debido a la discretización temporal por paquetes y al tamaño de muestra.
+\item \emph{Bloqueo de Poisson}: en una galería de $12\times5\times4$~m con las obstrucciones $U[0,2]$~m de~\cite{palacios2020} ($E(p)=0.0021$), $\epsilon=20$/min y $T_d=30$~s en 4000 réplicas, la fracción bloqueada simulada es $2.37\,\%\pm0.22\,\%$ (error estándar) frente a $2.12\,\%$ analítico de~\eqref{eq:sombra}; la diferencia (cercana a un error estándar) se debe a la discretización temporal por paquetes. Esta geometría de validación difiere de la galería minera principal, donde las dimensiones mayores de maquinaria ($w\in U[0.5,2.5]$~m, $h\in U[0.5,3.5]$~m) producen tasas de bloqueo más altas.
 \end{enumerate}
 
 \begin{figure}[!t]
@@ -226,7 +226,7 @@ El polvo produce un colapso abrupto debido a la atenuación exponencial de Beer-
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig_polvo}
-\caption{BER y Goodput frente a la concentración de polvo, sin obstrucciones (IC~95\,\%).}
+\caption{BER y Goodput frente a la concentración de polvo, sin obstrucciones (IC~95\,\%). Una BER nula se grafica en el piso de $10^{-5}$.}
 \label{fig:polvo}
 \end{figure}
 
@@ -238,19 +238,19 @@ El polvo produce un colapso abrupto debido a la atenuación exponencial de Beer-
 \end{figure}
 
 \subsection{Obstrucciones y arquitecturas ópticas}
-Las obstrucciones son el factor dominante en aire limpio (Fig.~\ref{fig:obstr}). Con 40 llegadas/min, la luminaria~1 queda bloqueada el 33.8\,\% del tiempo: 1~LED cae a 6.56~Mb/s (BER $6.0\times10^{-3}$), mientras que 2~LEDs fijos logran 8.27~Mb/s (BER $2.4\times10^{-3}$), igualando prácticamente al selector ideal. El selector práctico, en cambio, rinde peor (7.05~Mb/s, BER $5.0\times10^{-2}$). Incluso sin obstrucciones (E0), el selector práctico pierde 1.59~Mb/s respecto a la suma fija (7.82 frente a 9.41~Mb/s): los 16~bits de pilotos reducen el techo en 10.5\,\%, y al estar el receptor equidistante de ambas luminarias ($x=13$~m), el error de estimación (8\,\%) supera la histéresis (5\,\%) y provoca 69 conmutaciones espurias por ciclo (7.15\,\% de interrupción). En el escenario combinado E6, 2~LEDs fijos obtiene 4.28~Mb/s (BER $3.5\times10^{-2}$) frente a 4.08~Mb/s (BER $2.0\times10^{-2}$) del selector práctico.
+Las obstrucciones son el factor dominante en aire limpio (Fig.~\ref{fig:obstr}). Con 40 llegadas/min, la luminaria~1 queda bloqueada el 33.8\,\% del tiempo: 1~LED cae a 6.56~Mb/s (BER $6.0\times10^{-3}$), mientras que 2~LEDs fijos logran 8.27~Mb/s (BER $2.4\times10^{-3}$), igualando prácticamente al selector ideal. El selector práctico, en cambio, rinde peor (7.05~Mb/s, BER $5.0\times10^{-2}$). Incluso sin obstrucciones (E0), el selector práctico pierde 1.59~Mb/s respecto a la suma fija (7.82 frente a 9.41~Mb/s): los 16~bits de pilotos reducen el techo en 10.5\,\%, y al estar el receptor equidistante de ambas luminarias ($x=13$~m), el error de estimación (8\,\%) supera la histéresis (5\,\%) y provoca 69 conmutaciones espurias por réplica de 24~s (7.15\,\% de interrupción). En el escenario combinado E6, sin embargo, 1~LED (4.82~Mb/s, BER $5.6\times10^{-2}$) supera a 2~LEDs fijos (4.28~Mb/s, BER $3.5\times10^{-2}$) y al selector práctico (4.08~Mb/s, BER $2.0\times10^{-2}$): con la potencia dividida en dos, bloquear una luminaria reduce la señal a la mitad, dejándola justo sobre el umbral fijo del receptor; mientras en aire limpio las reflexiones salvan la decisión, en el bajo margen de E6 (14.6~dB) el ruido provoca errores durante el 20.6\,\% del tiempo con algún bloqueo parcial, frente al 10.4\,\% de bloqueo de la luminaria única.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig_obstrucciones}
-\caption{BER y Goodput frente a la intensidad de obstrucciones para las arquitecturas VLC, Wi-Fi e híbrido (IC~95\,\%).}
+\caption{BER y Goodput frente a la intensidad de obstrucciones para las arquitecturas VLC, Wi-Fi e híbrido (IC~95\,\%). Una BER nula se grafica en el piso de $10^{-5}$.}
 \label{fig:obstr}
 \end{figure}
 
 \subsection{Comparación con Wi-Fi y esquema híbrido}
 La Tabla~\ref{tab:res} y la Fig.~\ref{fig:comp} comparan todas las arquitecturas. A 5.4~m sin EMI, el Wi-Fi mantiene 9.41~Mb/s y BER nula incluso con polvo denso o 40 obstrucciones/min. Al introducir EMI, su disponibilidad cae al 82.5\,\% con 40~dB (6.77~Mb/s) y al 20.0\,\% con 50~dB (1.03~Mb/s), aunque su BER condicional durante el tiempo disponible sigue siendo nula gracias al MCS robusto.
 
-El esquema híbrido (basado en 2~LEDs fijos) elimina la penalización en aire limpio (9.41~Mb/s en E0) y mantiene 9.41~Mb/s tanto bajo 50~dB de EMI (operando en VLC) como bajo 1500~mg/m$^{3}$ de polvo o 40 obstrucciones/min (apoyándose en Wi-Fi). Cuando coinciden fallas severas (E9a: polvo 1500~mg/m$^{3}$, EMI 40~dB, 10 obstr./min), el VLC cae a 0 y el Wi-Fi opera el 72.1\,\% del tiempo con 5.85~Mb/s; el híbrido iguala ese Goodput (5.85~Mb/s) y recurre al VLC durante las caídas del Wi-Fi, resultando en una BER media de $5.9\times10^{-2}$. En E9b (E6 + EMI 40~dB), el híbrido supera a ambas tecnologías individuales alcanzando 6.66~Mb/s (BER $2.5\times10^{-2}$).
+El esquema híbrido (basado en 2~LEDs fijos) elimina la penalización en aire limpio (9.41~Mb/s en E0) y mantiene 9.41~Mb/s tanto bajo 50~dB de EMI (operando en VLC) como bajo 1500~mg/m$^{3}$ de polvo o 40 obstrucciones/min (9.406~Mb/s con una pérdida mínima de $\approx 0.005$~Mb/s por conmutación al bloquearse ambos LEDs). Cuando coinciden fallas severas (E9a: polvo 1500~mg/m$^{3}$, EMI 40~dB, 10 obstr./min), el VLC cae a 0 y el Wi-Fi opera el 72.1\,\% del tiempo con 5.85~Mb/s; el híbrido iguala ese Goodput (5.85~Mb/s), pero su BER media sube a $5.9\times10^{-2}$ porque durante el 27.9\,\% de indisponibilidad del Wi-Fi intenta sostener el enlace sobre el VLC colapsado por polvo (donde sí se contabilizan errores de bit), a diferencia del Wi-Fi solo que simplemente queda indisponible. En E9b (E6 + EMI 40~dB), el híbrido supera a ambas tecnologías individuales alcanzando 6.66~Mb/s (BER $2.5\times10^{-2}$).
 
 \begin{figure}[!t]
 \centering
@@ -303,14 +303,14 @@ En el análisis estático de densidad (Fig.~\ref{fig:dens}), pasar de 2 a 3 lumi
 \end{figure}
 
 \section{Desafíos, limitaciones y contexto normativo}
-Los resultados evidencian tres compromisos clave. Primero, la dependencia del LOS hace que, aun con 46.2~dB de margen, un vehículo bloquee el trayecto directo y haga caer la señal bajo el umbral fijo del receptor. Segundo, la atenuación exponencial por polvo provoca un colapso abrupto entre 1200 y 1500~mg/m$^{3}$. En la normativa chilena (Decreto Supremo N.°~594~\cite{ds594}), los límites permisibles ponderados para polvo respirable de sílice (cuarzo: 0.08~mg/m$^{3}$) y polvo total no especificado (8.0~mg/m$^{3}$) son órdenes de magnitud menores; por ende, bajo operación regular el VLC es totalmente robusto frente al polvo, y el rango de colapso simulado representa únicamente eventos extremos transitorios (como tronaduras o nubes densas locales tras carguío). Tercero, a 5.4~m sin EMI el Wi-Fi supera al VLC, por lo que el despliegue de VLC o híbrido se justifica específicamente en zonas con alta EMI o distancias mayores donde la RF se degrade.
+Los resultados evidencian tres compromisos clave. Primero, la dependencia del LOS hace que, aun con 46.2~dB de margen, un vehículo bloquee el trayecto directo y haga caer la señal bajo el umbral fijo del receptor. Segundo, la atenuación exponencial por polvo provoca un colapso abrupto entre 1200 y 1500~mg/m$^{3}$. En la normativa chilena (Decreto Supremo N.°~594~\cite{ds594}), los límites permisibles ponderados para polvo respirable de sílice (cuarzo: 0.08~mg/m$^{3}$) y polvo total no especificado (8.0~mg/m$^{3}$) son órdenes de magnitud menores; por ende, bajo operación regular el VLC es totalmente robusto frente al polvo, y el rango de colapso simulado representa únicamente eventos extremos transitorios (como tronaduras o nubes densas locales tras carguío). Tercero, a 5.4~m sin EMI el Wi-Fi iguala al VLC en aire limpio y lo supera bajo polvo denso u obstrucciones, por lo que el despliegue de VLC o híbrido se justifica específicamente en zonas con alta EMI o distancias mayores donde la RF se degrade.
 
 Como limitaciones del estudio, la validación frente a~\cite{palacios2020} es parcial (el pulso directo difiere en un factor 3.4), las reflexiones consideran solo primer orden sobre paredes planas y el polvo se modela como medio atenuador homogéneo sin dispersión hacia el receptor~\cite{palacios2022}. Asimismo, los parámetros térmicos, dimensiones de maquinaria, ruido de focos y parámetros RF ($n=2.2$, $\sigma=5$~dB a una sola distancia fija) son supuestos de ingeniería sin medición en faena, y el análisis de densidad de luminarias es estático; por ello, las cifras representan tendencias relativas y requieren validación experimental en galería antes de fijar criterios de diseño definitivo.
 
 \section{Recomendaciones y conclusiones}
 Para una implementación industrial práctica se desprenden cuatro lineamientos:
 \begin{enumerate}
-\item \emph{Redundancia simple por suma fija}: iluminar cada tramo con al menos dos luminarias transmitiendo en simultáneo (espaciado $\le 8.7$~m, tres luminarias en 26~m) iguala la confiabilidad del selector ideal sin complejidad de conmutación ni pérdidas por estimación ruidosa.
+\item \emph{Redundancia simple por suma fija}: en aire limpio y con obstrucciones (donde el margen es amplio), iluminar cada tramo con al menos dos luminarias transmitiendo en simultáneo (espaciado $\le 8.7$~m, tres luminarias en 26~m) iguala la confiabilidad del selector ideal sin complejidad de conmutación ni pérdidas por estimación ruidosa.
 \item \emph{Mantenimiento guiado por polvo y tasa adaptativa}: dado que el enlace colapsa abruptamente al superar 1200~mg/m$^{3}$ y es muy sensible a la suciedad de lentes en ese régimen, la limpieza óptica debe activarse por concentración de polvo (eventos de carguío/tronadura) y complementarse con reducción de tasa (5~Mb/s) y mejor disipación térmica en zonas calurosas.
 \item \emph{Arquitectura híbrida coherente}: en sectores expuestos a EMI ($\ge 40$~dB) o distancias mayores, conviene emplear un esquema híbrido basado en \emph{2~LEDs fijos} con respaldo Wi-Fi, evitando selectores ópticos inestables.
 \item \emph{Verificación de cobertura}: el espaciamiento entre luminarias debe diseñarse considerando el mapa de margen en condición hostil (Fig.~\ref{fig:cobertura}) y no solo en aire limpio.
@@ -328,7 +328,7 @@ Se utilizaron herramientas de inteligencia artificial generativa únicamente com
 \bibitem{palacios2022} P. Palacios Játiva \emph{et al.}, ``An enhanced VLC channel model for underground mining environments considering a 3D dust particle distribution model,'' \emph{Sensors}, vol. 22, n.º 7, art. 2483, 2022, doi: 10.3390/s22072483.
 \bibitem{becerra2023} R. Becerra \emph{et al.}, ``A wavelength-dependent visible light communication channel model for underground environments and its performance using a color-shift keying modulation scheme,'' \emph{Electronics}, vol. 12, n.º 3, art. 577, 2023, doi: 10.3390/electronics12030577.
 \bibitem{javaid2021} F. Javaid, A. Wang, M. U. Sana, A. Husain e I. Ashraf, ``Characteristic study of visible light communication and influence of coal dust particles in underground coal mines,'' \emph{Electronics}, vol. 10, n.º 8, art. 883, 2021, doi: 10.3390/electronics10080883.
-\bibitem{li2024} C. Li \emph{et al.}, ``Study on VLC channel model in underground mining scenarios with extinction effect and shadowing effect,'' \emph{Appl. Opt.}, vol. 63, n.º 14, 2024, doi: 10.1364/AO.520073.
+\bibitem{li2024} C. Li \emph{et al.}, ``Study on VLC channel model in underground mining scenarios with extinction effect and shadowing effect,'' \emph{Appl. Opt.}, vol. 63, n.º 14, pp. 3973--3983, 2024, doi: 10.1364/AO.520073.
 \bibitem{iturralde2024} D. Iturralde \emph{et al.}, ``A new Internet of Things hybrid VLC/RF system for m-Health in an underground mining industry,'' \emph{Sensors}, vol. 24, n.º 1, art. 31, 2024, doi: 10.3390/s24010031.
 \bibitem{kahn1997} J. M. Kahn y J. R. Barry, ``Wireless infrared communications,'' \emph{Proc. IEEE}, vol. 85, n.º 2, pp. 265--298, feb. 1997.
 \bibitem{komine2004} T. Komine y M. Nakagawa, ``Fundamental analysis for visible-light communication system using LED lights,'' \emph{IEEE Trans. Consum. Electron.}, vol. 50, n.º 1, pp. 100--107, feb. 2004.

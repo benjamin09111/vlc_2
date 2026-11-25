@@ -89,8 +89,8 @@ estilos = {'-', '--', ':'}; colores = {est.col.azul, est.col.gris, est.col.naran
 for c = 1:3
     plot(ax, xp, Zx(:, c), estilos{c}, 'Color', colores{c}, 'LineWidth', 1.1);
 end
-yline(ax, 21.6, '-', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.6);
-xlabel(ax, txt.x_m); ylabel(ax, txt.margen_corto); ylim(ax, [-20 50]);
+yline(ax, 21.6, '--', 'Color', est.col.naranjo, 'LineWidth', 0.9);
+xlabel(ax, txt.x_m); ylabel(ax, txt.margen_corto); xlim(ax, [0 26]); ylim(ax, [-20 50]);
 lg = legend(ax, {txt.limpio, 'Polvo 600 mg/m^3', txt.hostil_corto}, ...
     'Box', 'off', 'FontSize', 7, 'TextColor', 'k', 'NumColumns', 1);
 lg.Layout.Tile = 'south';
