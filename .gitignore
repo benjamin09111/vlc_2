@@ -1,0 +1,34 @@
+# Material de terceros (se cita en la bibliografia, no se redistribuye)
+referencias/
+
+# Paquetes comprimidos historicos del companero (su contenido ya esta descomprimido en legacy/)
+legacy/**/*.zip
+
+# Archivos temporales de MATLAB
+*.asv
+*.m~
+slprj/
+*.autosave
+
+# Archivos auxiliares de LaTeX
+*.aux
+*.log
+!docs/*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Documento de traspaso interno (no va al repositorio publico)
+context.md
+
+# Cache del canal estatico de la demostracion (se regenera)
+software/demo/cache_canal.mat

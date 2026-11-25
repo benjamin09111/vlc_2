@@ -1,0 +1,25 @@
+ID,Objetivo,Resultado,Aprobada
+P-02,"Decaimiento 1/d^2 en LOS","pendiente log-log=-2.000000 (esperada -2)",1
+P-03,"Concentracion nula implica extincion nula","alpha(C=0)=0, transmision=1",1
+P-04,"Sin maquinas no hay bloqueo","bloqueo con 0 maquinas = 0 paquetes",1
+P-06,"Interseccion segmento-caja","6 de 6 casos correctos",1
+P-07,"Con rho = 0 la ganancia NLOS es nula","suma de ganancias = 0",1
+P-09,"Reciprocidad: intercambiar emisor y receptor","ganancia=4.55592e-07 y 4.55592e-07, dif. relativa=0",1
+P-10,"Convergencia NLOS: elementos de 0.10 m frente a 0.02 m","diferencia relativa de la ganancia total=0.00049",1
+P-11,"Bloqueo por obstaculo cilindrico","7 de 7 casos correctos",1
+V-01,"Escenario de referencia de [PJ2020]: NLOS/LOS, retardo, D_RMS","NLOS/LOS=10.11 % (articulo 11.47 %, dif. 11.8 %); con 1/pi=3.22 %; D_RMS=0.296 ns; reflexiones posteriores a LOS=1",1
+V-02,"BER Monte Carlo frente a Q(a/2), OOK con umbral a/2","5 puntos, 2e6 bits cada uno; peor desviacion=1.76 desv. estandar",1
+V-03,"Bloqueo de Poisson simulado frente a 1 - exp(-eps Td E[p])","simulado=0.0237 +/- 0.0022, analitico=0.0212 (E[p]=0.0021)",1
+P-05,"Mayor temperatura: menos potencia optica y mas ruido","factor 20-60 C: 1.025 a 0.825; factor(25 C)=1.000; ruido creciente=1",1
+P-08,"Goodput no supera la tasa nominal util","Goodput maximo=9.4118 Mb/s; tope=9.4118 Mb/s",1
+P-12,"Ruido termico a 10 Mb/s y 25 C frente al calculo manual","modelo=1.002e-08 A, manual=1.002e-08 A",1
+P-13,"Convergencia NLOS en la galeria: elementos de 0.5 m frente a 0.1 m","diferencia relativa=0.025",1
+P-15,"Tasa nominal inferior a 1/(10 D_RMS)","D_RMS=0.0752 ns; 1/(10 D_RMS)=1.33e+03 Mb/s; Rb=10 Mb/s",1
+V-04,"BER simulada frente a la teorica condicionada al canal","71 filas con BER teorica > 1e-5; peor desviacion=1.82 errores estandar",1
+V-05,"Bloqueo simulado con adelgazamiento frente a 1 - exp(-eps Td E[p])","simulado=0.1133 +/- 0.0063, analitico=0.1088 (E[p]=0.0230)",1
+W-01,"Balance de potencia Wi-Fi: Pr, MCS y tasa frente al calculo manual","d=5.39 m; Pr modelo=-36.14 dBm, manual=-36.14 dBm; MCS=8; tasa=10.00 Mb/s",1
+W-02,"MCS no crece con la interferencia y es menor con bloqueo","MCS libre 8 a 0; bloqueado 8 a 0",1
+W-03,"Hibrido: con VLC sano equivale a 2 LEDs fijos; con VLC caido, al Wi-Fi","dif. en referencia=0; dif. con polvo 2000=0",1
+D-01,"Traza de la demostracion frente a la tabla de resultados (6 arquitecturas)","diferencia maxima BER=5.2e-18; Goodput=2.4e-14 Mb/s",1
+D-02,"Demostracion interactiva: construccion de la ventana, avance de 30 paquetes y las cuatro pestanas","ventana creada, 30 pasos y cuatro pestanas",1
+D-03,"Margen de la demostracion (2 LEDs fijos) frente al margen de la simulacion en la referencia","demostracion=46.1611 dB; simulacion=46.1611 dB",1
